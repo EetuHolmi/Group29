@@ -2,19 +2,19 @@ from machine import Pin, PWM
 import utime
 
 # define led and ir_sensor pins
-led = Pin(16, Pin.OUT)
-ir_sensor = Pin(15, Pin.IN)
+
+ir_sensor = Pin(16, Pin.IN)
 
 #define servo positions
 MID = 1500000
 MIN = 1000000
-MAX = 2000000
+MAX = 1800000
 
 #flag to see if servo in use
 servo_running = False
 
 #define servo pin
-servo = PWM(Pin(14))
+servo = PWM(Pin(18))
 servo.freq(50)
 servo.duty_ns(MID)
 
@@ -30,6 +30,7 @@ def use_servo():
     servo.duty_ns(MAX)
     utime.sleep(2)
     
+    
     servo_running = False
     
     
@@ -41,13 +42,13 @@ while True:
     
     # if something detected
     if ir_sensor.value() == 0:
-        led.value(1)
+
         print(servo_running)
         if not servo_running:
             use_servo()
             
     else:
-        led.value(0)
+        pass
         
     utime.sleep(0.1)
     
