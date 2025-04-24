@@ -1,6 +1,6 @@
-import uasyncio as asyncio
 import machine
 import random
+import time
 
 # === Constants ===
 MIN_SERVO_ANGLE = 50
@@ -13,34 +13,48 @@ servo_positions = [
     for i in range(NUM_POSITIONS)
 ]
 
-# Configure the servo PWM pin (adjust if needed).
+# Configure the servo PWM pin
 servo_pin = machine.Pin(18)
 servo = machine.PWM(servo_pin)
-servo.freq(50)  # Standard 50Hz (20ms period)
+servo.freq(50)  # Standard servo PWM frequency
 
-async def set_servo_angle(angle):
+
+def set_servo_angle(angle):
     """
-    Set the servo to a specific angle (0 to 180 degrees).
+    Sets servo angle (0–180) for SG90 using calibrated duty values.
     """
     angle = max(0, min(180, angle))
-    pulse_ms = 1 + (angle / 180)
-    duty = int((pulse_ms / 20) * 65535)
-    servo.duty_u16(duty)
-    print(f"Servo: Setting angle to {angle}° (pulse: {pulse_ms:.2f} ms, duty: {duty})")
-    await asyncio.sleep(0.03)
+    
+    # SG90: 0.5ms to 2.4ms pulse width (narrower than standard)
+    min_duty = 1638   # 0.5 ms pulse (1638/65535 ≈ 2.5%)
+    max_duty = 7864   # 2.4 ms pulse (7864/65535 ≈ 12%)
 
-async def move_servo_to_random_position(current):
+    duty = int(min_duty + (angle / 180) * (max_duty - min_duty))
+    servo.duty_u16(duty)
+    print(f"SG90 angle: {angle}, duty: {duty}")
+    time.sleep(0.3)
+
+
+def move_servo_to_random_position(current):
     """
-    Randomly choose one of the 4 preset positions (excluding current).
+    Randomly choose one of the 4 preset positions (excluding current),
+    and move to it smoothly.
     """
     available_positions = [pos for pos in servo_positions if pos != current]
     target = random.choice(available_positions)
-    print(f"Servo: Moving from {current}° to target {target}°")
+    print(f"Servo: Moving from {current}° to {target}°")
 
     step = 2 if target > current else -2
     for angle in range(current, target + step, step):
-        await set_servo_angle(angle)
-        await asyncio.sleep(0.05)
+        set_servo_angle(angle)
+        time.sleep(0.05)
 
     print(f"Servo: Reached {target}°")
     return target
+
+
+# === Example Usage ===
+if __name__ == "__main__":
+    current_angle = 90
+    set_servo_angle(current_angle)
+    current_angle = move_servo_to_random_position(current_angle)
