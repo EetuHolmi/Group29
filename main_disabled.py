@@ -4,7 +4,7 @@ import time
 import wifi
 import _thread
 from webserver import serve_web
-from servo_control import random_servo_move, set_servo_angle
+from servo_control import move_servo_to_random_position, set_servo_angle
 
 # Setup
 led = machine.Pin("LED", machine.Pin.OUT)
@@ -36,7 +36,6 @@ async def blink_led():
 
 async def get_ir_sensor_value():
     val = ir_sensor.value()
-    #print("IR Sensor:", "Ball detected" if val == 0 else "Not detected")
     return val
 
 async def run_motor(speed, direction, run_time):
@@ -68,7 +67,7 @@ async def main():
         if sensor_val == 0:
             last_ball_ms = time.ticks_ms()
             await run_motor(65535, 'cw', 2.9)
-            current_servo = await random_servo_move(current_servo, 50, 130, step=2, delay=0.03)
+            current_servo = await move_servo_to_random_position(current_servo)
             await asyncio.sleep(4)
         else:
             if time.ticks_diff(time.ticks_ms(), last_ball_ms) > 10000:
