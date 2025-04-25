@@ -14,7 +14,7 @@ MAX = 1800000
 servo_running = False
 
 #define servo pin
-servo = PWM(Pin(18))
+servo = PWM(Pin(15))
 servo.freq(50)
 servo.duty_ns(MID)
 

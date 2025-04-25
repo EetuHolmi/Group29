@@ -66,7 +66,7 @@ async def main():
         sensor_val = await get_ir_sensor_value()
         if sensor_val == 0:
             last_ball_ms = time.ticks_ms()
-            await run_motor(65535, 'cw', 2.9)
+            await run_motor(65535, 'cw', 5)
             current_servo = await move_servo_to_random_position(current_servo)
             await asyncio.sleep(4)
         else:
