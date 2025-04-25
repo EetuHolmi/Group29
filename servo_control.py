@@ -1,60 +1,57 @@
 import machine
-import random
 import time
 
 # === Constants ===
-MIN_SERVO_ANGLE = 50
-MAX_SERVO_ANGLE = 130
-
-# Calculate 4 equally spaced positions (including min and max)
-NUM_POSITIONS = 4
-servo_positions = [
-    MIN_SERVO_ANGLE + i * (MAX_SERVO_ANGLE - MIN_SERVO_ANGLE) // (NUM_POSITIONS - 1)
-    for i in range(NUM_POSITIONS)
-]
+SERVO_START_POSITION = 90  # Main center position
+SERVO_POSITIONS = {
+    1: 60,   # Position 1
+    2: 90,   # Position 2 (center)
+    3: 120   # Position 3
+}
 
 # Configure the servo PWM pin
 servo_pin = machine.Pin(18)
 servo = machine.PWM(servo_pin)
 servo.freq(50)  # Standard servo PWM frequency
 
-
 def set_servo_angle(angle):
     """
     Sets servo angle (0–180) for SG90 using calibrated duty values.
     """
     angle = max(0, min(180, angle))
-    
-    # SG90: 0.5ms to 2.4ms pulse width (narrower than standard)
-    min_duty = 1638   # 0.5 ms pulse (1638/65535 ≈ 2.5%)
-    max_duty = 7864   # 2.4 ms pulse (7864/65535 ≈ 12%)
+    min_duty = 1638   # 0.5 ms pulse
+    max_duty = 7864   # 2.4 ms pulse
 
     duty = int(min_duty + (angle / 180) * (max_duty - min_duty))
     servo.duty_u16(duty)
     print(f"SG90 angle: {angle}, duty: {duty}")
     time.sleep(0.3)
 
-
-def move_servo_to_random_position(current):
+def move_servo_to_position(position_number):
     """
-    Randomly choose one of the 4 preset positions (excluding current),
-    and move to it smoothly.
+    Move the servo to a predefined position: 1, 2, or 3.
     """
-    available_positions = [pos for pos in servo_positions if pos != current]
-    target = random.choice(available_positions)
-    print(f"Servo: Moving from {current}° to {target}°")
+    if position_number not in SERVO_POSITIONS:
+        print(f"Invalid position {position_number}")
+        return
 
-    step = 2 if target > current else -2
-    for angle in range(current, target + step, step):
-        set_servo_angle(angle)
-        time.sleep(0.05)
+    target_angle = SERVO_POSITIONS[position_number]
+    print(f"Moving to position {position_number} ({target_angle}°)")
+    set_servo_angle(target_angle)
 
-    print(f"Servo: Reached {target}°")
-    return target
-
+def move_servo_to_start_position():
+    """
+    Move the servo to its main start position.
+    """
+    print(f"Moving to start position ({SERVO_START_POSITION}°)")
+    set_servo_angle(SERVO_START_POSITION)
 
 # === Example Usage ===
 if __name__ == "__main__":
-    current_angle = 90
-    set_servo_angle(current_angle)
-    current_angle = move_servo_to_random_position(current_angle)
+    move_servo_to_start_position()
+    time.sleep(1)
+    move_servo_to_position(1)
+    time.sleep(1)
+    move_servo_to_position(3)
+    time.sleep(1)
+    move_servo_to_start_position()
