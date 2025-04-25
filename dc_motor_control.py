@@ -35,7 +35,6 @@ def run_motor(speed, direction, run_time):
 
 if __name__ == '__main__':
     print("Motor Control Script")
-    while True:
-        run_motor(65535, 'cw', 5)
-        time.sleep(1)
+    run_motor(65535, 'cw', 5)
+    print("Motor Stopped")
 
