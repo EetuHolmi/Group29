@@ -43,7 +43,13 @@ async def game_loop():
         await asyncio.sleep(0.5)  # Check every half second
 
 
+# Global variable to track if game loop is running
+game_task = None
+
+
 async def handle_client(reader, writer):
+    global game_task
+
     request_line = await reader.readline()
     print("Request:", request_line)
 
@@ -52,7 +58,6 @@ async def handle_client(reader, writer):
 
     request = request_line.decode()
 
-    # === Handling Web Requests ===
     if "GET /manual_pos1" in request:
         print("Manual: Moving to Position 1")
         servo_control.move_servo_to_position(1)
@@ -66,37 +71,34 @@ async def handle_client(reader, writer):
         print("Manual: Throwing ball")
         dc_motor_control.run_motor(65535, 'cw', 5)
     elif "GET /start_auto" in request:
-        print("Automatic: Starting full game")
-        # Game loop already started in main, maybe later you can start/stop it here if needed
+        print("Automatic: Starting game loop")
+        if game_task is None:
+            game_task = asyncio.create_task(game_loop())
+            print("Game loop started")
 
-    # === HTML Web Page ===
     response = """\
-HTTP/1.1 200 OK
-
 <html>
 <head>
     <title>Ping Pong Bot Control</title>
 </head>
 <body>
     <h1>Manual Control</h1>
+
     <form action="/manual_pos1" method="get">
-        <input type="radio" id="pos1" name="position" checked>
-        <label for="pos1">Position 1</label><br>
         <button type="submit">Move Servo to Position 1</button>
     </form>
     <br>
+
     <form action="/manual_pos2" method="get">
-        <input type="radio" id="pos2" name="position">
-        <label for="pos2">Position 2</label><br>
         <button type="submit">Move Servo to Position 2</button>
     </form>
     <br>
+
     <form action="/manual_pos3" method="get">
-        <input type="radio" id="pos3" name="position">
-        <label for="pos3">Position 3</label><br>
         <button type="submit">Move Servo to Position 3</button>
     </form>
     <br>
+
     <form action="/throw" method="get">
         <button type="submit">Throw Ball (Start Motor)</button>
     </form>
@@ -107,6 +109,7 @@ HTTP/1.1 200 OK
     </form>
 </body>
 </html>
+
 """
     writer.write(response.encode())
     await writer.drain()
@@ -118,8 +121,6 @@ async def main():
     asyncio.create_task(blink_led())
     # Move servo to start position
     servo_control.move_servo_to_start_position()
-    # Start the game loop
-    asyncio.create_task(game_loop())
 
     server = await asyncio.start_server(handle_client, "0.0.0.0", 80)
     print("Web server running...")
