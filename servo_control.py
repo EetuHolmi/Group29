@@ -34,7 +34,6 @@ def set_servo_angle(angle, release_pwm=True):
         print("PWM released to reduce humming")
 
 
-
 def move_servo_to_position(position_number):
     """
     Move the servo to a predefined position: 1, 2, or 3.

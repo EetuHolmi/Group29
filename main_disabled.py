@@ -1,10 +1,9 @@
 import uasyncio as asyncio
 import machine
-import time
-import wifi
-import _thread
-from webserver import serve_web
-from servo_control import move_servo_to_random_position, set_servo_angle
+import random
+import ir_sensor_control
+import servo_control
+import dc_motor_control
 
 # Setup
 led = machine.Pin("LED", machine.Pin.OUT)
@@ -16,16 +15,6 @@ motorPWM.freq(1000)
 motorCW = machine.Pin(14, machine.Pin.OUT)
 motorACW = machine.Pin(15, machine.Pin.OUT)
 
-# Connect to WiFi or fallback to AP
-net = wifi.connect_or_create_ap()
-
-# Start webserver thread only once
-if not globals().get("_web_thread_started", False):
-    _thread.start_new_thread(serve_web, (motorPWM, motorCW, motorACW))
-    globals()["_web_thread_started"] = True
-
-# Show IP
-print("Device IP:", net.ifconfig()[0])
 
 async def blink_led():
     while True:
@@ -34,50 +23,27 @@ async def blink_led():
         led.value(0)
         await asyncio.sleep(1)
 
-async def get_ir_sensor_value():
-    val = ir_sensor.value()
-    return val
 
-async def run_motor(speed, direction, run_time):
-    if direction == 'cw':
-        motorCW.value(1)
-        motorACW.value(0)
-    elif direction == 'acw':
-        motorCW.value(0)
-        motorACW.value(1)
-    else:
-        motorCW.value(0)
-        motorACW.value(0)
+def random_number():
+    return random.randint(1, 3)
 
-    motorPWM.duty_u16(speed if direction != 'stop' else 0)
-    print(f"Motor: {direction} at speed {speed} for {run_time}s")
-    await asyncio.sleep(run_time)
-    motorCW.value(0)
-    motorACW.value(0)
-    motorPWM.duty_u16(0)
 
 async def main():
+    print("Let's Start The Game")
     asyncio.create_task(blink_led())
-    current_servo = 90
-    await set_servo_angle(current_servo)
-    last_ball_ms = time.ticks_ms()
+    # Move servo to start position
+    servo_control.move_servo_to_start_position()
 
     while True:
-        sensor_val = await get_ir_sensor_value()
-        if sensor_val == 0:
-            last_ball_ms = time.ticks_ms()
-            await run_motor(65535, 'cw', 5)
-            current_servo = await move_servo_to_random_position(current_servo)
-            await asyncio.sleep(4)
-        else:
-            if time.ticks_diff(time.ticks_ms(), last_ball_ms) > 10000:
-                if current_servo != 90:
-                    print("No ball for 10s. Re-centering servo.")
-                    await set_servo_angle(90)
-                    current_servo = 90
-            else:
-                print(f"No ball, servo holds at {current_servo}°")
-            await asyncio.sleep(0.5)
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(1)
+        # Check IR sensor value
+        sensor_value = ir_sensor_control.get_ir_value()
+        if sensor_value == 0:
+            print(f"IR Sensor Value: {sensor_value}")
+            # Move servo to position 1
+            servo_control.move_servo_to_position(random_number())
+            # Run motor clockwise for 5 seconds
+            dc_motor_control.run_motor(65535, 'cw', 5)
+
 
 asyncio.run(main())
