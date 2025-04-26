@@ -1,6 +1,8 @@
 import uasyncio as asyncio
 import machine
 import random
+
+import screen
 import wifi
 import ir_sensor_control
 import servo_control
@@ -214,6 +216,7 @@ function sendRequest(path) {{
 
 async def main():
     print("Let's Start The Game")
+    screen.update_display("Ping Pong Bot", "Control Panel","")
     asyncio.create_task(blink_led())
     servo_control.move_servo_to_start_position()
     asyncio.create_task(game_loop())
