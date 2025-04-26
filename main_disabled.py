@@ -51,25 +51,61 @@ async def handle_client(reader, writer):
         pass
 
     request = request_line.decode()
-    if "GET /start" in request:
-        print("Web: Start command received")
-        servo_control.move_servo_to_start_position()
-        sensor_value = ir_sensor_control.get_ir_value()
-        if sensor_value == 0:
-            servo_control.move_servo_to_position(random_number())
-            dc_motor_control.run_motor(65535, 'cw', 5)
 
+    # === Handling Web Requests ===
+    if "GET /manual_pos1" in request:
+        print("Manual: Moving to Position 1")
+        servo_control.move_servo_to_position(1)
+    elif "GET /manual_pos2" in request:
+        print("Manual: Moving to Position 2")
+        servo_control.move_servo_to_position(2)
+    elif "GET /manual_pos3" in request:
+        print("Manual: Moving to Position 3")
+        servo_control.move_servo_to_position(3)
+    elif "GET /throw" in request:
+        print("Manual: Throwing ball")
+        dc_motor_control.run_motor(65535, 'cw', 5)
+    elif "GET /start_auto" in request:
+        print("Automatic: Starting full game")
+        # Game loop already started in main, maybe later you can start/stop it here if needed
+
+    # === HTML Web Page ===
     response = """\
 HTTP/1.1 200 OK
 
 <html>
-    <head><title>Control Panel</title></head>
-    <body>
-        <h1>Control Panel</h1>
-        <form action="/start" method="get">
-            <button type="submit">Start Game</button>
-        </form>
-    </body>
+<head>
+    <title>Ping Pong Bot Control</title>
+</head>
+<body>
+    <h1>Manual Control</h1>
+    <form action="/manual_pos1" method="get">
+        <input type="radio" id="pos1" name="position" checked>
+        <label for="pos1">Position 1</label><br>
+        <button type="submit">Move Servo to Position 1</button>
+    </form>
+    <br>
+    <form action="/manual_pos2" method="get">
+        <input type="radio" id="pos2" name="position">
+        <label for="pos2">Position 2</label><br>
+        <button type="submit">Move Servo to Position 2</button>
+    </form>
+    <br>
+    <form action="/manual_pos3" method="get">
+        <input type="radio" id="pos3" name="position">
+        <label for="pos3">Position 3</label><br>
+        <button type="submit">Move Servo to Position 3</button>
+    </form>
+    <br>
+    <form action="/throw" method="get">
+        <button type="submit">Throw Ball (Start Motor)</button>
+    </form>
+
+    <h1>Automatic Control</h1>
+    <form action="/start_auto" method="get">
+        <button type="submit">Start Automatic Game</button>
+    </form>
+</body>
 </html>
 """
     writer.write(response.encode())
