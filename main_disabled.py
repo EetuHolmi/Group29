@@ -23,7 +23,11 @@ motorACW = machine.Pin(15, machine.Pin.OUT)
 
 # WiFi connect
 net = wifi.connect_or_create_ap()
-print("Device IP:", net.ifconfig()[0])
+ip_address = net.ifconfig()[0]
+print("Device IP:", ip_address)
+
+# Show IP on the OLED
+screen.update_display(ip_address, "Waiting...", "")
 
 
 async def blink_led():
@@ -44,6 +48,7 @@ async def game_loop():
             sensor_value = ir_sensor_control.get_ir_value()
             if sensor_value == 0:
                 print("Ball detected by IR sensor!")
+                screen.update_display(ip_address, "Ball Detected!", "Throwing...")
                 servo_control.move_servo_to_position(random.randint(1, 3))
                 await dc_motor_control.run_motor(65535, 'cw', motor_run_time)
                 await asyncio.sleep(0)
@@ -74,19 +79,25 @@ async def handle_client(reader, writer):
 
     if "GET /start_auto" in request:
         game_running = True
+        screen.update_display(ip_address, "Auto Mode", "Running...")
     elif "GET /stop_auto" in request:
         game_running = False
+        screen.update_display(ip_address, "Manual Mode", "Stopped")
     elif "GET /manual_pos1" in request:
         servo_control.move_servo_to_position(1)
+        screen.update_display(ip_address, "Manual Move", "Position 1")
         await asyncio.sleep(0)
     elif "GET /manual_pos2" in request:
         servo_control.move_servo_to_position(2)
+        screen.update_display(ip_address, "Manual Move", "Position 2")
         await asyncio.sleep(0)
     elif "GET /manual_pos3" in request:
         servo_control.move_servo_to_position(3)
+        screen.update_display(ip_address, "Manual Move", "Position 3")
         await asyncio.sleep(0)
     elif "GET /throw" in request:
         await dc_motor_control.run_motor(65535, 'cw', motor_run_time)
+        screen.update_display(ip_address, "Manual Throw", "")
         await asyncio.sleep(0)
     elif "GET /set_motor_time" in request:
         if "time=" in request:
@@ -95,6 +106,7 @@ async def handle_client(reader, writer):
                 if 5 <= selected <= 15:
                     motor_run_time = selected
                     print(f"Motor run time set to {motor_run_time} seconds")
+                    screen.update_display(ip_address, "Motor Time Set", f"{motor_run_time}s")
                 redirect_response = "HTTP/1.1 303 See Other\r\nLocation: /\r\n\r\n"
                 writer.write(redirect_response.encode())
                 await writer.drain()
@@ -216,7 +228,7 @@ function sendRequest(path) {{
 
 async def main():
     print("Let's Start The Game")
-    screen.update_display("Ping Pong Bot", "Control Panel","")
+    screen.update_display(ip_address, "Game Ready", "")
     asyncio.create_task(blink_led())
     servo_control.move_servo_to_start_position()
     asyncio.create_task(game_loop())
