@@ -104,13 +104,16 @@ async def handle_client(reader, writer):
 
     <h2>{auto_status}</h2>
 
-    <script>
-    function sendRequest(path) {{
-        fetch(path)
-        .then(response => console.log("Request sent:", path));
-        .catch(error => console.error('Error:', error));
-    }}
-    </script>
+<script>
+function sendRequest(path) {{
+    fetch(path)
+    .then(response => {{
+        console.log("Request sent:", path);
+        setTimeout(() => location.reload(), 100);
+    }})
+    .catch(error => console.error('Error:', error));
+}}
+</script>
 
     </body>
     </html>
