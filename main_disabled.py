@@ -103,6 +103,39 @@ async def handle_client(reader, writer):
     <head>
     <title>Ping Pong Bot Control</title>
     </head>
+    <style>
+body {{
+    text-align: center;
+    font-family: Arial, sans-serif;
+    margin-top: 30px;
+}}
+
+button {{
+    padding: 15px 25px;
+    font-size: 18px;
+    margin: 10px;
+    border-radius: 8px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}}
+
+button:hover {{
+    background-color: #45a049;
+}}
+
+select {{
+    padding: 10px;
+    font-size: 16px;
+    margin: 10px;
+    border-radius: 5px;
+}}
+
+h1 {{
+    color: #333;
+}}
+</style>
+
     <body>
     <form action="/set_motor_time" method="get">
     <label for="time">Motor Run Time (seconds):</label><br>
