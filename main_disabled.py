@@ -18,7 +18,7 @@ motorPWM.freq(1000)
 motorCW = machine.Pin(14, machine.Pin.OUT)
 motorACW = machine.Pin(15, machine.Pin.OUT)
 
-# WiFi connect at the start
+# WiFi connect
 net = wifi.connect_or_create_ap()
 print("Device IP:", net.ifconfig()[0])
 
@@ -43,12 +43,7 @@ async def game_loop():
                 print("Ball detected by IR sensor!")
                 servo_control.move_servo_to_position(random.randint(1, 3))
                 dc_motor_control.run_motor(65535, 'cw', 5)
-
-        await asyncio.sleep(0.5)  # Check every half second
-
-
-# Global variable to track if game loop is running
-game_task = None
+        await asyncio.sleep(0.5)
 
 
 async def handle_client(reader, writer):
@@ -64,31 +59,22 @@ async def handle_client(reader, writer):
 
     if "favicon.ico" in request:
         writer.write("HTTP/1.1 404 Not Found\r\n\r\n".encode())
-        await writer.drain()
-        await writer.wait_closed()
+        await asyncio.sleep(0.001)  # allow time to send
         return
 
-    # === Handle Web Commands ===
     if "GET /start_auto" in request:
-        print("Start auto mode")
         game_running = True
     elif "GET /stop_auto" in request:
-        print("Stop auto mode")
         game_running = False
     elif "GET /manual_pos1" in request:
-        print("Move servo to Position 1")
         servo_control.move_servo_to_position(1)
     elif "GET /manual_pos2" in request:
-        print("Move servo to Position 2")
         servo_control.move_servo_to_position(2)
     elif "GET /manual_pos3" in request:
-        print("Move servo to Position 3")
         servo_control.move_servo_to_position(3)
     elif "GET /throw" in request:
-        print("Start motor to throw ball")
         dc_motor_control.run_motor(65535, 'cw', 5)
 
-    # === Dynamic Button HTML ===
     if game_running:
         auto_button_text = "Stop Automatic Game"
         auto_button_action = "/stop_auto"
@@ -98,42 +84,37 @@ async def handle_client(reader, writer):
         auto_button_action = "/start_auto"
         auto_status = "Status: Manual Mode"
 
-    response = f"""\
-HTTP/1.1 200 OK
+    response = f"""HTTP/1.1 200 OK
 
-<html>
-<head>
+    <html>
+    <head>
     <title>Ping Pong Bot Control</title>
-</head>
-<body>
+    </head>
+    <body>
+
     <h1>Manual Control</h1>
 
-    <form action="/manual_pos1" method="get">
-        <button type="submit">Move Servo to Position 1</button>
-    </form><br>
-
-    <form action="/manual_pos2" method="get">
-        <button type="submit">Move Servo to Position 2</button>
-    </form><br>
-
-    <form action="/manual_pos3" method="get">
-        <button type="submit">Move Servo to Position 3</button>
-    </form><br>
-
-    <form action="/throw" method="get">
-        <button type="submit">Throw Ball (Start Motor)</button>
-    </form><br>
+    <button onclick="sendRequest('/manual_pos1')">Move Servo to Position 1</button><br><br>
+    <button onclick="sendRequest('/manual_pos2')">Move Servo to Position 2</button><br><br>
+    <button onclick="sendRequest('/manual_pos3')">Move Servo to Position 3</button><br><br>
+    <button onclick="sendRequest('/throw')">Throw Ball (Start Motor)</button><br><br>
 
     <h1>Automatic Control</h1>
-    <form action="{auto_button_action}" method="get">
-        <button type="submit">{auto_button_text}</button>
-    </form><br>
+    <button onclick="sendRequest('{auto_button_action}')">{auto_button_text}</button><br><br>
 
     <h2>{auto_status}</h2>
 
-</body>
-</html>
-"""
+    <script>
+    function sendRequest(path) {{
+        fetch(path)
+        .then(response => console.log("Request sent:", path));
+        .catch(error => console.error('Error:', error));
+    }}
+    </script>
+
+    </body>
+    </html>
+    """
     writer.write(response.encode())
     await writer.drain()
     await writer.wait_closed()
@@ -142,13 +123,11 @@ HTTP/1.1 200 OK
 async def main():
     print("Let's Start The Game")
     asyncio.create_task(blink_led())
-    # Move servo to start position
     servo_control.move_servo_to_start_position()
-    game_task = asyncio.create_task(game_loop())
+    asyncio.create_task(game_loop())
     server = await asyncio.start_server(handle_client, "0.0.0.0", 80)
     print("Web server running...")
 
-    # Keep alive manually
     while True:
         await asyncio.sleep(1)
 
