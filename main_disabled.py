@@ -49,7 +49,7 @@ async def game_loop():
 
 
 async def handle_client(reader, writer):
-    global game_running
+    global game_running, motor_run_time
 
     request_line = await reader.readline()
     print("Request:", request_line)
@@ -61,9 +61,10 @@ async def handle_client(reader, writer):
 
     if "favicon.ico" in request:
         writer.write("HTTP/1.1 404 Not Found\r\n\r\n".encode())
-        await asyncio.sleep(0.001)  # allow time to send
+        await asyncio.sleep(0.001)
         return
 
+    # === Handle incoming requests ===
     if "GET /start_auto" in request:
         game_running = True
     elif "GET /stop_auto" in request:
@@ -74,19 +75,36 @@ async def handle_client(reader, writer):
         servo_control.move_servo_to_position(2)
     elif "GET /manual_pos3" in request:
         servo_control.move_servo_to_position(3)
+    elif "GET /throw" in request:
+        dc_motor_control.run_motor(65535, 'cw', motor_run_time)
     elif "GET /set_motor_time" in request:
         if "time=" in request:
             try:
                 selected = int(request.split("time=")[1].split()[0].split("&")[0])
                 if 5 <= selected <= 15:
-                    global motor_run_time
                     motor_run_time = selected
                     print(f"Motor run time set to {motor_run_time} seconds")
+                # Redirect to main page after setting time
+                redirect_response = "HTTP/1.1 303 See Other\r\nLocation: /\r\n\r\n"
+                writer.write(redirect_response.encode())
+                await writer.drain()
+                await writer.wait_closed()
+                return
             except Exception as e:
                 print("Error parsing motor time:", e)
 
-    elif "GET /throw" in request:
-        dc_motor_control.run_motor(65535, 'cw', motor_run_time)
+    # === Prepare selected option for dropdown ===
+    selected_5 = "selected" if motor_run_time == 5 else ""
+    selected_6 = "selected" if motor_run_time == 6 else ""
+    selected_7 = "selected" if motor_run_time == 7 else ""
+    selected_8 = "selected" if motor_run_time == 8 else ""
+    selected_9 = "selected" if motor_run_time == 9 else ""
+    selected_10 = "selected" if motor_run_time == 10 else ""
+    selected_11 = "selected" if motor_run_time == 11 else ""
+    selected_12 = "selected" if motor_run_time == 12 else ""
+    selected_13 = "selected" if motor_run_time == 13 else ""
+    selected_14 = "selected" if motor_run_time == 14 else ""
+    selected_15 = "selected" if motor_run_time == 15 else ""
 
     if game_running:
         auto_button_text = "Stop Automatic Game"
@@ -97,13 +115,13 @@ async def handle_client(reader, writer):
         auto_button_action = "/start_auto"
         auto_status = "Status: Manual Mode"
 
+    # === Send full HTML response ===
     response = f"""HTTP/1.1 200 OK
 
-    <html>
-    <head>
-    <title>Ping Pong Bot Control</title>
-    </head>
-    <style>
+<html>
+<head>
+<title>Ping Pong Bot Control</title>
+<style>
 body {{
     text-align: center;
     font-family: Arial, sans-serif;
@@ -135,22 +153,25 @@ h1 {{
     color: #333;
 }}
 </style>
+</head>
 
-    <body>
-    <form action="/set_motor_time" method="get">
+<body>
+
+<h1>Motor Time Setting</h1>
+<form action="/set_motor_time" method="get">
     <label for="time">Motor Run Time (seconds):</label><br>
     <select name="time">
-        <option value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-        <option value="10">10</option>
-        <option value="11">11</option>
-        <option value="12">12</option>
-        <option value="13">13</option>
-        <option value="14">14</option>
-        <option value="15">15</option>
+        <option value="5" {selected_5}>5</option>
+        <option value="6" {selected_6}>6</option>
+        <option value="7" {selected_7}>7</option>
+        <option value="8" {selected_8}>8</option>
+        <option value="9" {selected_9}>9</option>
+        <option value="10" {selected_10}>10</option>
+        <option value="11" {selected_11}>11</option>
+        <option value="12" {selected_12}>12</option>
+        <option value="13" {selected_13}>13</option>
+        <option value="14" {selected_14}>14</option>
+        <option value="15" {selected_15}>15</option>
     </select><br><br>
     <button type="submit">Set Motor Time</button>
 </form>
