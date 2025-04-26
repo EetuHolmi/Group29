@@ -9,7 +9,6 @@ import dc_motor_control
 game_running = False
 motor_run_time = 5  # default seconds
 
-
 # Setup
 led = machine.Pin("LED", machine.Pin.OUT)
 ir_sensor = machine.Pin(16, machine.Pin.IN)
@@ -44,39 +43,49 @@ async def game_loop():
             if sensor_value == 0:
                 print("Ball detected by IR sensor!")
                 servo_control.move_servo_to_position(random.randint(1, 3))
-                dc_motor_control.run_motor(65535, 'cw', motor_run_time)
+                await dc_motor_control.run_motor(65535, 'cw', motor_run_time)
+                await asyncio.sleep(0)
         await asyncio.sleep(0.5)
 
 
 async def handle_client(reader, writer):
     global game_running, motor_run_time
 
-    request_line = await reader.readline()
-    print("Request:", request_line)
+    try:
+        request_line = await reader.readline()
+        print("Request:", request_line)
 
-    while await reader.readline() != b"\r\n":
-        pass
+        while await reader.readline() != b"\r\n":
+            pass
 
-    request = request_line.decode()
+        request = request_line.decode()
+
+    except Exception as e:
+        print("Error reading request:", e)
+        await writer.wait_closed()
+        return
 
     if "favicon.ico" in request:
         writer.write("HTTP/1.1 404 Not Found\r\n\r\n".encode())
         await asyncio.sleep(0.001)
         return
 
-    # === Handle incoming requests ===
     if "GET /start_auto" in request:
         game_running = True
     elif "GET /stop_auto" in request:
         game_running = False
     elif "GET /manual_pos1" in request:
         servo_control.move_servo_to_position(1)
+        await asyncio.sleep(0)
     elif "GET /manual_pos2" in request:
         servo_control.move_servo_to_position(2)
+        await asyncio.sleep(0)
     elif "GET /manual_pos3" in request:
         servo_control.move_servo_to_position(3)
+        await asyncio.sleep(0)
     elif "GET /throw" in request:
-        dc_motor_control.run_motor(65535, 'cw', motor_run_time)
+        await dc_motor_control.run_motor(65535, 'cw', motor_run_time)
+        await asyncio.sleep(0)
     elif "GET /set_motor_time" in request:
         if "time=" in request:
             try:
@@ -84,7 +93,6 @@ async def handle_client(reader, writer):
                 if 5 <= selected <= 15:
                     motor_run_time = selected
                     print(f"Motor run time set to {motor_run_time} seconds")
-                # Redirect to main page after setting time
                 redirect_response = "HTTP/1.1 303 See Other\r\nLocation: /\r\n\r\n"
                 writer.write(redirect_response.encode())
                 await writer.drain()
@@ -93,7 +101,6 @@ async def handle_client(reader, writer):
             except Exception as e:
                 print("Error parsing motor time:", e)
 
-    # === Prepare selected option for dropdown ===
     selected_5 = "selected" if motor_run_time == 5 else ""
     selected_6 = "selected" if motor_run_time == 6 else ""
     selected_7 = "selected" if motor_run_time == 7 else ""
@@ -115,7 +122,6 @@ async def handle_client(reader, writer):
         auto_button_action = "/start_auto"
         auto_status = "Status: Manual Mode"
 
-    # === Send full HTML response ===
     response = f"""HTTP/1.1 200 OK
 
 <html>
@@ -175,32 +181,32 @@ h1 {{
     </select><br><br>
     <button type="submit">Set Motor Time</button>
 </form>
-    <h1>Manual Control</h1>
 
-    <button onclick="sendRequest('/manual_pos1')">Move Servo to Position 1</button><br><br>
-    <button onclick="sendRequest('/manual_pos2')">Move Servo to Position 2</button><br><br>
-    <button onclick="sendRequest('/manual_pos3')">Move Servo to Position 3</button><br><br>
-    <button onclick="sendRequest('/throw')">Throw Ball (Start Motor)</button><br><br>
+<h1>Manual Control</h1>
+<button onclick="sendRequest('/manual_pos1')">Move Servo to Position 1</button><br><br>
+<button onclick="sendRequest('/manual_pos2')">Move Servo to Position 2</button><br><br>
+<button onclick="sendRequest('/manual_pos3')">Move Servo to Position 3</button><br><br>
+<button onclick="sendRequest('/throw')">Throw Ball (Start Motor)</button><br><br>
 
-    <h1>Automatic Control</h1>
-    <button onclick="sendRequest('{auto_button_action}')">{auto_button_text}</button><br><br>
+<h1>Automatic Control</h1>
+<button onclick="sendRequest('{auto_button_action}')">{auto_button_text}</button><br><br>
 
-    <h2>{auto_status}</h2>
+<h2>{auto_status}</h2>
 
 <script>
 function sendRequest(path) {{
     fetch(path)
     .then(response => {{
         console.log("Request sent:", path);
-        setTimeout(() => location.reload(), 100);
+        setTimeout(() => location.reload(), 1000); // 1 second reload
     }})
     .catch(error => console.error('Error:', error));
 }}
 </script>
 
-    </body>
-    </html>
-    """
+</body>
+</html>
+"""
     writer.write(response.encode())
     await writer.drain()
     await writer.wait_closed()
