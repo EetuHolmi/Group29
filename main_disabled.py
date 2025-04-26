@@ -7,6 +7,8 @@ import servo_control
 import dc_motor_control
 
 game_running = False
+motor_run_time = 5  # default seconds
+
 
 # Setup
 led = machine.Pin("LED", machine.Pin.OUT)
@@ -42,7 +44,7 @@ async def game_loop():
             if sensor_value == 0:
                 print("Ball detected by IR sensor!")
                 servo_control.move_servo_to_position(random.randint(1, 3))
-                dc_motor_control.run_motor(65535, 'cw', 5)
+                dc_motor_control.run_motor(65535, 'cw', motor_run_time)
         await asyncio.sleep(0.5)
 
 
@@ -72,8 +74,19 @@ async def handle_client(reader, writer):
         servo_control.move_servo_to_position(2)
     elif "GET /manual_pos3" in request:
         servo_control.move_servo_to_position(3)
+    elif "GET /set_motor_time" in request:
+        if "time=" in request:
+            try:
+                selected = int(request.split("time=")[1].split()[0].split("&")[0])
+                if 5 <= selected <= 15:
+                    global motor_run_time
+                    motor_run_time = selected
+                    print(f"Motor run time set to {motor_run_time} seconds")
+            except Exception as e:
+                print("Error parsing motor time:", e)
+
     elif "GET /throw" in request:
-        dc_motor_control.run_motor(65535, 'cw', 5)
+        dc_motor_control.run_motor(65535, 'cw', motor_run_time)
 
     if game_running:
         auto_button_text = "Stop Automatic Game"
@@ -91,7 +104,23 @@ async def handle_client(reader, writer):
     <title>Ping Pong Bot Control</title>
     </head>
     <body>
-
+    <form action="/set_motor_time" method="get">
+    <label for="time">Motor Run Time (seconds):</label><br>
+    <select name="time">
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="13">13</option>
+        <option value="14">14</option>
+        <option value="15">15</option>
+    </select><br><br>
+    <button type="submit">Set Motor Time</button>
+</form>
     <h1>Manual Control</h1>
 
     <button onclick="sendRequest('/manual_pos1')">Move Servo to Position 1</button><br><br>
