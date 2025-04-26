@@ -9,7 +9,7 @@ import servo_control
 import dc_motor_control
 
 game_running = False
-motor_run_time = 5  # default seconds
+motor_run_time = 7  # default seconds
 busy = False  # Busy flag
 
 # Setup
