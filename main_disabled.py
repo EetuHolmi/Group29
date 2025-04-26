@@ -10,6 +10,7 @@ import dc_motor_control
 
 game_running = False
 motor_run_time = 5  # default seconds
+busy = False  # Busy flag
 
 # Setup
 led = machine.Pin("LED", machine.Pin.OUT)
@@ -49,14 +50,13 @@ async def game_loop():
             if sensor_value == 0:
                 print("Ball detected by IR sensor!")
                 screen.update_display(ip_address, "Ball Detected!", "Throwing...")
-                servo_control.move_servo_to_position(random.randint(1, 3))
+                await servo_control.move_servo_to_position(random.randint(1, 3))
                 await dc_motor_control.run_motor(65535, 'cw', motor_run_time)
-                await asyncio.sleep(0)
         await asyncio.sleep(0.5)
 
 
 async def handle_client(reader, writer):
-    global game_running, motor_run_time
+    global game_running, motor_run_time, busy
 
     try:
         request_line = await reader.readline()
@@ -72,9 +72,12 @@ async def handle_client(reader, writer):
         await writer.wait_closed()
         return
 
+    if busy:
+        await writer.wait_closed()
+        return
+
     if "favicon.ico" in request:
-        writer.write("HTTP/1.1 404 Not Found\r\n\r\n".encode())
-        await asyncio.sleep(0.001)
+        await writer.wait_closed()
         return
 
     if "GET /start_auto" in request:
@@ -84,21 +87,25 @@ async def handle_client(reader, writer):
         game_running = False
         screen.update_display(ip_address, "Manual Mode", "Stopped")
     elif "GET /manual_pos1" in request:
-        servo_control.move_servo_to_position(1)
+        busy = True
+        await servo_control.move_servo_to_position(1)
+        busy = False
         screen.update_display(ip_address, "Manual Move", "Position 1")
-        await asyncio.sleep(0)
     elif "GET /manual_pos2" in request:
-        servo_control.move_servo_to_position(2)
+        busy = True
+        await servo_control.move_servo_to_position(2)
+        busy = False
         screen.update_display(ip_address, "Manual Move", "Position 2")
-        await asyncio.sleep(0)
     elif "GET /manual_pos3" in request:
-        servo_control.move_servo_to_position(3)
+        busy = True
+        await servo_control.move_servo_to_position(3)
+        busy = False
         screen.update_display(ip_address, "Manual Move", "Position 3")
-        await asyncio.sleep(0)
     elif "GET /throw" in request:
+        busy = True
         await dc_motor_control.run_motor(65535, 'cw', motor_run_time)
+        busy = False
         screen.update_display(ip_address, "Manual Throw", "")
-        await asyncio.sleep(0)
     elif "GET /set_motor_time" in request:
         if "time=" in request:
             try:
@@ -212,7 +219,6 @@ function sendRequest(path) {{
     fetch(path)
     .then(response => {{
         console.log("Request sent:", path);
-        setTimeout(() => location.reload(), 1000); // 1 second reload
     }})
     .catch(error => console.error('Error:', error));
 }}
@@ -230,7 +236,7 @@ async def main():
     print("Let's Start The Game")
     screen.update_display(ip_address, "Game Ready", "")
     asyncio.create_task(blink_led())
-    servo_control.move_servo_to_start_position()
+    await servo_control.move_servo_to_start_position()
     asyncio.create_task(game_loop())
     server = await asyncio.start_server(handle_client, "0.0.0.0", 80)
     print("Web server running...")

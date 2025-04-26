@@ -1,5 +1,5 @@
 import machine
-import time
+import uasyncio as asyncio  # use asyncio instead of time
 
 # === Constants ===
 SERVO_START_POSITION = 90  # Main center position
@@ -15,7 +15,7 @@ servo = machine.PWM(servo_pin)
 servo.freq(50)  # Standard servo PWM frequency
 
 
-def set_servo_angle(angle, release_pwm=True):
+async def set_servo_angle(angle, release_pwm=True):
     """
     Sets servo angle (0–180) for SG90.
     Optionally stop PWM after moving to reduce humming.
@@ -27,14 +27,14 @@ def set_servo_angle(angle, release_pwm=True):
     duty = int(min_duty + (angle / 180) * (max_duty - min_duty))
     servo.duty_u16(duty)
     print(f"SG90 angle: {angle}, duty: {duty}")
-    time.sleep(0.5)  # Wait for servo to reach position
+    await asyncio.sleep(0.5)  # async wait for servo to move
 
     if release_pwm:
         servo.duty_u16(0)  # Stop PWM signal
         print("PWM released to reduce humming")
 
 
-def move_servo_to_position(position_number):
+async def move_servo_to_position(position_number):
     """
     Move the servo to a predefined position: 1, 2, or 3.
     """
@@ -44,23 +44,26 @@ def move_servo_to_position(position_number):
 
     target_angle = SERVO_POSITIONS[position_number]
     print(f"Moving to position {position_number} ({target_angle}°)")
-    set_servo_angle(target_angle)
+    await set_servo_angle(target_angle)
 
 
-def move_servo_to_start_position():
+async def move_servo_to_start_position():
     """
     Move the servo to its main start position.
     """
     print(f"Moving to start position ({SERVO_START_POSITION}°)")
-    set_servo_angle(SERVO_START_POSITION)
+    await set_servo_angle(SERVO_START_POSITION)
 
 
-# === Example Usage ===
+# === Example Usage (for testing directly) ===
 if __name__ == "__main__":
-    move_servo_to_start_position()
-    time.sleep(1)
-    move_servo_to_position(1)
-    time.sleep(1)
-    move_servo_to_position(3)
-    time.sleep(1)
-    move_servo_to_start_position()
+    async def test():
+        await move_servo_to_start_position()
+        await asyncio.sleep(1)
+        await move_servo_to_position(1)
+        await asyncio.sleep(1)
+        await move_servo_to_position(3)
+        await asyncio.sleep(1)
+        await move_servo_to_start_position()
+
+    asyncio.run(test())
