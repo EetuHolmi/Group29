@@ -8,7 +8,7 @@ import ir_sensor_control
 import servo_control
 import dc_motor_control
 
-game_running = False
+game_running = False # Game state false means its in manual mode
 motor_run_time = 7  # default seconds
 busy = False  # Busy flag
 
