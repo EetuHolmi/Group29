@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   height="236.62mm"
+   viewBox="0 0 200 236.62"
+   width="200mm"
+   version="1.1"
+   id="svg111"
+   sodipodi:docname="electronics board.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs111" />
+  <sodipodi:namedview
+     id="namedview111"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showguides="false"
+     inkscape:zoom="1"
+     inkscape:cx="279"
+     inkscape:cy="387.5"
+     inkscape:window-width="1920"
+     inkscape:window-height="1171"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg111" />
+  <!--
+SideDoorHousing - Box with service hatches on either one or both of the sides that are locked with latches
+
+
+
+This box is designed as a housing for electronic projects but could be used for other purposes. It has hatches that can be re-opened with simple tools. If built from thin enough material, it intentionally cannot be opened with bare hands.
+
+The hatches are on the x sides.
+
+#### Assembly instructions
+The main body is easy to assemble:
+1. Starting with the floor and then add the four walls (for any removable sides, the wall will just be a small part on the base )
+2. Add the top piece
+
+For the removable walls:
+1. Add the lips to the removable walls
+2. Sit the latches in place (it is importand to make sure the springs on the latches point inwards and the angled ends point to the side walls. See image below)
+3. Glue the U-shaped clamps in place (it is important **not** to glue the latches)
+
+![Wall details](static/samples/SideDoorHousing.jpg)
+
+
+#### Re-Opening
+
+The latches lock in place when closed. To open them they need to be pressed in and can then be moved aside.
+
+![Closed Box](static/samples/SideDoorHousing-2.jpg)
+
+
+
+
+Created with Boxes.py (https://boxes.hackerspace-bamberg.de/)
+Creation date: 2025-04-16 13:25:26
+Command line (remove spaces between dashes): boxes SideDoorHousing - -x=150 - -y=200 - -h=50 - -thickness=2.6 - -burn=0.03
+Url: https://boxes.hackerspace-bamberg.de/SideDoorHousing?FingerJoint_style=rectangular&FingerJoint_surroundingspaces=0.5&FingerJoint_bottom_lip=0.0&FingerJoint_edge_width=1.0&FingerJoint_extra_length=0.0&FingerJoint_finger=2.0&FingerJoint_play=0.0&FingerJoint_space=2.0&FingerJoint_width=1.0&Stackable_angle=60&Stackable_bottom_stabilizers=0.0&Stackable_height=2.0&Stackable_holedistance=1.0&Stackable_width=4.0&x=150&y=200&h=50&bottom_edge=s&double_door=0&double_door=1&thickness=2.6&format=svg&tabs=0.0&qr_code=0&debug=0&labels=0&labels=1&reference=100.0&inner_corners=loop&burn=0.03&language=en&render=2
+Url short: https://boxes.hackerspace-bamberg.de/SideDoorHousing?x=150&y=200&h=50&thickness=2.6&burn=0.03
+SettingsUrl: https://boxes.hackerspace-bamberg.de/SideDoorHousing?FingerJoint_style=rectangular&FingerJoint_surroundingspaces=0.5&FingerJoint_bottom_lip=0.0&FingerJoint_edge_width=1.0&FingerJoint_extra_length=0.0&FingerJoint_finger=2.0&FingerJoint_play=0.0&FingerJoint_space=2.0&FingerJoint_width=1.0&Stackable_angle=60&Stackable_bottom_stabilizers=0.0&Stackable_height=2.0&Stackable_holedistance=1.0&Stackable_width=4.0&x=150&y=200&h=50&bottom_edge=s&double_door=0&double_door=1&thickness=2.6&format=svg&tabs=0.0&qr_code=0&debug=0&labels=0&labels=1&reference=100.0&inner_corners=loop&burn=0.03&language=en&render=2
+SettingsUrl short: https://boxes.hackerspace-bamberg.de/SideDoorHousing?x=150&y=200&h=50&thickness=2.6&burn=0.03
+-->
+  <title
+     id="title1">SideDoorHousing</title>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work>
+        <dc:title>SideDoorHousing</dc:title>
+        <dc:date>2025-04-16 13:25:26</dc:date>
+        <dc:source>https://boxes.hackerspace-bamberg.de/SideDoorHousing?FingerJoint_style=rectangular&amp;FingerJoint_surroundingspaces=0.5&amp;FingerJoint_bottom_lip=0.0&amp;FingerJoint_edge_width=1.0&amp;FingerJoint_extra_length=0.0&amp;FingerJoint_finger=2.0&amp;FingerJoint_play=0.0&amp;FingerJoint_space=2.0&amp;FingerJoint_width=1.0&amp;Stackable_angle=60&amp;Stackable_bottom_stabilizers=0.0&amp;Stackable_height=2.0&amp;Stackable_holedistance=1.0&amp;Stackable_width=4.0&amp;x=150&amp;y=200&amp;h=50&amp;bottom_edge=s&amp;double_door=0&amp;double_door=1&amp;thickness=2.6&amp;format=svg&amp;tabs=0.0&amp;qr_code=0&amp;debug=0&amp;labels=0&amp;labels=1&amp;reference=100.0&amp;inner_corners=loop&amp;burn=0.03&amp;language=en&amp;render=2</dc:source>
+        <dc:source>https://boxes.hackerspace-bamberg.de/SideDoorHousing?x=150&amp;y=200&amp;h=50&amp;thickness=2.6&amp;burn=0.03</dc:source>
+        <dc:description>Box with service hatches on either one or both of the sides that are locked with latches
+
+
+This box is designed as a housing for electronic projects but could be used for other purposes. It has hatches that can be re-opened with simple tools. If built from thin enough material, it intentionally cannot be opened with bare hands.
+
+The hatches are on the x sides.
+
+#### Assembly instructions
+The main body is easy to assemble:
+1. Starting with the floor and then add the four walls (for any removable sides, the wall will just be a small part on the base )
+2. Add the top piece
+
+For the removable walls:
+1. Add the lips to the removable walls
+2. Sit the latches in place (it is importand to make sure the springs on the latches point inwards and the angled ends point to the side walls. See image below)
+3. Glue the U-shaped clamps in place (it is important **not** to glue the latches)
+
+![Wall details](static/samples/SideDoorHousing.jpg)
+
+
+#### Re-Opening
+
+The latches lock in place when closed. To open them they need to be pressed in and can then be moved aside.
+
+![Closed Box](static/samples/SideDoorHousing-2.jpg)
+
+
+
+Created with Boxes.py (https://boxes.hackerspace-bamberg.de/)
+Command line: boxes SideDoorHousing --FingerJoint_style=rectangular --FingerJoint_surroundingspaces=0.5 --FingerJoint_bottom_lip=0.0 --FingerJoint_edge_width=1.0 --FingerJoint_extra_length=0.0 --FingerJoint_finger=2.0 --FingerJoint_play=0.0 --FingerJoint_space=2.0 --FingerJoint_width=1.0 --Stackable_angle=60 --Stackable_bottom_stabilizers=0.0 --Stackable_height=2.0 --Stackable_holedistance=1.0 --Stackable_width=4.0 --x=150 --y=200 --h=50 --bottom_edge=s --double_door=0 --double_door=1 --thickness=2.6 --format=svg --tabs=0.0 --qr_code=0 --debug=0 --labels=0 --labels=1 --reference=100.0 --inner_corners=loop --burn=0.03
+Command line short: boxes SideDoorHousing --x=150 --y=200 --h=50 --thickness=2.6 --burn=0.03
+Url: https://boxes.hackerspace-bamberg.de/SideDoorHousing?FingerJoint_style=rectangular&amp;FingerJoint_surroundingspaces=0.5&amp;FingerJoint_bottom_lip=0.0&amp;FingerJoint_edge_width=1.0&amp;FingerJoint_extra_length=0.0&amp;FingerJoint_finger=2.0&amp;FingerJoint_play=0.0&amp;FingerJoint_space=2.0&amp;FingerJoint_width=1.0&amp;Stackable_angle=60&amp;Stackable_bottom_stabilizers=0.0&amp;Stackable_height=2.0&amp;Stackable_holedistance=1.0&amp;Stackable_width=4.0&amp;x=150&amp;y=200&amp;h=50&amp;bottom_edge=s&amp;double_door=0&amp;double_door=1&amp;thickness=2.6&amp;format=svg&amp;tabs=0.0&amp;qr_code=0&amp;debug=0&amp;labels=0&amp;labels=1&amp;reference=100.0&amp;inner_corners=loop&amp;burn=0.03&amp;language=en&amp;render=2
+Url short: https://boxes.hackerspace-bamberg.de/SideDoorHousing?x=150&amp;y=200&amp;h=50&amp;thickness=2.6&amp;burn=0.03
+SettingsUrl: https://boxes.hackerspace-bamberg.de/SideDoorHousing?FingerJoint_style=rectangular&amp;FingerJoint_surroundingspaces=0.5&amp;FingerJoint_bottom_lip=0.0&amp;FingerJoint_edge_width=1.0&amp;FingerJoint_extra_length=0.0&amp;FingerJoint_finger=2.0&amp;FingerJoint_play=0.0&amp;FingerJoint_space=2.0&amp;FingerJoint_width=1.0&amp;Stackable_angle=60&amp;Stackable_bottom_stabilizers=0.0&amp;Stackable_height=2.0&amp;Stackable_holedistance=1.0&amp;Stackable_width=4.0&amp;x=150&amp;y=200&amp;h=50&amp;bottom_edge=s&amp;double_door=0&amp;double_door=1&amp;thickness=2.6&amp;format=svg&amp;tabs=0.0&amp;qr_code=0&amp;debug=0&amp;labels=0&amp;labels=1&amp;reference=100.0&amp;inner_corners=loop&amp;burn=0.03&amp;language=en&amp;render=2
+SettingsUrl short: https://boxes.hackerspace-bamberg.de/SideDoorHousing?x=150&amp;y=200&amp;h=50&amp;thickness=2.6&amp;burn=0.03
+</dc:description>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="p-1"
+     style="fill:none;stroke-linecap:round;stroke-linejoin:round" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:0.02;stroke-linejoin:round;stroke-dasharray:none"
+     d="m 38.51,7.01 h 15 v 82 h 56 v -82 h 12 V 3.0104271 h 26.5 v 6.0000002 h 5.00043 V 197.01042 H 148.01 v 6 H 8.0099999 v -6 H 3.0104271 V 9.0104273 H 8.0099999 V 3.0104271 H 38.51 Z"
+     id="path113"
+     sodipodi:nodetypes="ccccccccccccccccccccc" />
+</svg>
